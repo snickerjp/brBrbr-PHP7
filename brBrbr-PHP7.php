@@ -28,9 +28,9 @@ function brBrbr($brbr) {
 	$brbr = preg_replace_callback('!(</?(?:table|img|thead|tfoot|caption|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|textarea|input|blockquote|address|p|math|script|h[1-6])[^>]*>)\s*<br />!', function($m) {return "$1";}, $brbr);
 	$brbr = preg_replace_callback('|<blockquote([^>]*)>|i', function($m) {return "</p>\n<blockquote$1><p>";}, $brbr);
 	$brbr = str_replace('</blockquote>', "</p></blockquote>\n<p>", $brbr);
-	$brbr = preg_replace('/(<pre.*?>)(.*?)<\/pre>/ise', "clr_br('$0')", $brbr);
-	$brbr = preg_replace('/(<script.*?>)(.*?)<\/script>/ise', "clr_br('$0')", $brbr);
-	$brbr = preg_replace('/(<form.*?>)(.*?)<\/form>/ise', "clr_br('$0')", $brbr);
+	$brbr = preg_replace_callback('/(<pre.*?>)(.*?)<\/pre>/is', function($m) {return clr_br($m[0]);}, $brbr);
+	$brbr = preg_replace_callback('/(<script.*?>)(.*?)<\/script>/is', function($m) {return clr_br($m[0]);}, $brbr);
+	$brbr = preg_replace_callback('/(<form.*?>)(.*?)<\/form>/is', function($m) {return clr_br($m[0]);}, $brbr);
 	$brbr="<p>\n".$brbr."</p>\n";
 	return $brbr; 
 }
