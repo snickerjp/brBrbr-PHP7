@@ -1,11 +1,18 @@
 <?php
 /*
-Plugin Name:brBrbr
-Plugin URI:http://camcam.info/wordpress/101/
+Plugin Name:brBrbr-PHP7
+Plugin URI:https://github.com/snickerjp/brBrbr-PHP7
 Description:Line feed is converted to &lt;br /&gt;.
-Version:2.0
-Author:CamCam
-Author URI:http://camcam.info/
+Version:2.0.1
+Author:snickerjp
+Author URI:https://github.com/snickerjp/
+*/
+
+/*
+Original Plugin URI:http://camcam.info/wordpress/101/
+Original Version:2.0
+Original Author:CamCam
+Original Author URI:http://camcam.info/
 */
 
 remove_filter('the_content','wpautop');
