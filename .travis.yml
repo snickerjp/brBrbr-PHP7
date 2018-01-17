@@ -7,3 +7,6 @@ sudo: false
 # PHP version used in first build configuration.
 php:
     - "7.1"
+
+# do test
+script: phpunit brBrbr-PHP7.php
