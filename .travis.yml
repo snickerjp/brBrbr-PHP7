@@ -9,4 +9,4 @@ php:
     - "7.1"
 
 # do test
-script: phpunit brBrbr-PHP7.php
+script: php -l brBrbr-PHP7.php
