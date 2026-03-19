@@ -1,19 +1,21 @@
 <?php
 /*
-Plugin Name:brBrbr-PHP7
-Plugin URI:https://github.com/snickerjp/brBrbr-PHP7
-Description:Line feed is converted to &lt;br /&gt;.
-Version:2.0.1
-Author:snickerjp
-Author URI:https://github.com/snickerjp/
+Plugin Name: brBrbr-PHP7
+Plugin URI: https://github.com/snickerjp/brBrbr-PHP7
+Description: Line feed is converted to &lt;br&gt;.
+Version: 2.1.2
+Author: snickerjp
+Author URI: https://github.com/snickerjp/
 */
 
 /*
-Original Plugin URI:http://camcam.info/wordpress/101/
-Original Version:2.0
-Original Author:CamCam
-Original Author URI:http://camcam.info/
+Original Plugin URI: http://camcam.info/wordpress/101/
+Original Version: 2.0
+Original Author: CamCam
+Original Author URI: http://camcam.info/
 */
+
+defined('ABSPATH') || exit;
 
 remove_filter('the_content', 'wpautop');
 add_filter('the_content', 'brBrbr');
@@ -22,44 +24,40 @@ add_filter('the_content', 'brBrbr');
 remove_filter('comment_text', 'wpautop', 30);
 add_filter('comment_text', 'brBrbr', 30);
 
-function brBrbr($brbr)
+function brBrbr($content)
 {
-    $brbr = str_replace(array(
-        "\r\n",
-        "\r"
-    ), "\n", $brbr); // cross-platform newlines
-    $brbr = str_replace("\n", "<br />\n", $brbr); // cross-platform newlines
-    $brbr = preg_replace_callback('!(</?(?:table|img|thead|tfoot|caption|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|textarea|input|blockquote|address|p|math|script|h[1-6])[^>]*>)\s*<br />!', function($m)
-    {
-        return "$1";
-    }, $brbr);
-    $brbr = preg_replace_callback('|<blockquote([^>]*)>|i', function($m)
-    {
-        return "</p>\n<blockquote$1><p>";
-    }, $brbr);
-    $brbr = str_replace('</blockquote>', "</p></blockquote>\n<p>", $brbr);
-    $brbr = preg_replace_callback('/(<pre.*?>)(.*?)<\/pre>/is', function($m)
-    {
-        return clr_br($m[0]);
-    }, $brbr);
-    $brbr = preg_replace_callback('/(<script.*?>)(.*?)<\/script>/is', function($m)
-    {
-        return clr_br($m[0]);
-    }, $brbr);
-    $brbr = preg_replace_callback('/(<form.*?>)(.*?)<\/form>/is', function($m)
-    {
-        return clr_br($m[0]);
-    }, $brbr);
-    $brbr = "<p>\n" . $brbr . "</p>\n";
-    return $brbr;
+    // Normalize newlines
+    $content = str_replace(array("\r\n", "\r"), "\n", $content);
+    $content = str_replace("\n", "<br>\n", $content);
+
+    // Remove <br> immediately after specific HTML tags (block-level and related tags)
+    $block_tags = 'table|img|thead|tfoot|caption|tbody|tr|td|th|div|dl|dd|dt'
+                . '|ul|ol|li|pre|select|form|textarea|input|blockquote'
+                . '|address|p|math|script|h[1-6]';
+    $content = preg_replace("!(</?(?:{$block_tags})[^>]*>)\s*<br\s*/?>!", "$1", $content);
+
+    // Blockquote paragraph wrapping
+    // NOTE: この処理と末尾の<p>ラッピングはオリジナル版(CamCam版)から引き継いだ
+    // wpautop代替としての段落構造生成処理。ブロック要素を含むコンテンツでは
+    // 不正なHTMLを生成する場合があるが、既存ユーザーへの互換性を維持するため残置。
+    $content = preg_replace_callback('|<blockquote([^>]*)>|i', function($m) {
+        return "</p>\n<blockquote{$m[1]}><p>";
+    }, $content);
+    $content = str_replace('</blockquote>', "</p></blockquote>\n<p>", $content);
+
+    // Strip <br> inside pre, script, form blocks
+    foreach (array('pre', 'script', 'form') as $tag) {
+        $content = preg_replace_callback("/(<{$tag}.*?>)(.*?)<\/{$tag}>/is", function($m) {
+            return brbrbr_strip_br($m[0]);
+        }, $content);
+    }
+
+    $content = "<p>\n" . $content . "</p>\n";
+    return $content;
 }
 
 
-function clr_br($str)
+function brbrbr_strip_br($str)
 {
-    $str = str_replace("<br />", "", $str);
-    $str = str_replace('\"', '"', $str);
-    return $str;
+    return str_replace(array("<br>", "<br/>", "<br />"), "", $str);
 }
-
-?>
