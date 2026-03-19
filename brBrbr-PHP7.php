@@ -1,18 +1,18 @@
 <?php
 /*
-Plugin Name:brBrbr-PHP7
-Plugin URI:https://github.com/snickerjp/brBrbr-PHP7
-Description:Line feed is converted to &lt;br&gt;.
-Version:2.1.1
-Author:snickerjp
-Author URI:https://github.com/snickerjp/
+Plugin Name: brBrbr-PHP7
+Plugin URI: https://github.com/snickerjp/brBrbr-PHP7
+Description: Line feed is converted to &lt;br&gt;.
+Version: 2.1.2
+Author: snickerjp
+Author URI: https://github.com/snickerjp/
 */
 
 /*
-Original Plugin URI:http://camcam.info/wordpress/101/
-Original Version:2.0
-Original Author:CamCam
-Original Author URI:http://camcam.info/
+Original Plugin URI: http://camcam.info/wordpress/101/
+Original Version: 2.0
+Original Author: CamCam
+Original Author URI: http://camcam.info/
 */
 
 defined('ABSPATH') || exit;
@@ -34,9 +34,12 @@ function brBrbr($content)
     $block_tags = 'table|img|thead|tfoot|caption|tbody|tr|td|th|div|dl|dd|dt'
                 . '|ul|ol|li|pre|select|form|textarea|input|blockquote'
                 . '|address|p|math|script|h[1-6]';
-    $content = preg_replace("!(</?(?:{$block_tags})[^>]*>)\s*<br>!", "$1", $content);
+    $content = preg_replace("!(</?(?:{$block_tags})[^>]*>)\s*<br\s*/?>!", "$1", $content);
 
     // Blockquote paragraph wrapping
+    // NOTE: この処理と末尾の<p>ラッピングはオリジナル版(CamCam版)から引き継いだ
+    // wpautop代替としての段落構造生成処理。ブロック要素を含むコンテンツでは
+    // 不正なHTMLを生成する場合があるが、既存ユーザーへの互換性を維持するため残置。
     $content = preg_replace_callback('|<blockquote([^>]*)>|i', function($m) {
         return "</p>\n<blockquote{$m[1]}><p>";
     }, $content);
@@ -45,7 +48,7 @@ function brBrbr($content)
     // Strip <br> inside pre, script, form blocks
     foreach (array('pre', 'script', 'form') as $tag) {
         $content = preg_replace_callback("/(<{$tag}.*?>)(.*?)<\/{$tag}>/is", function($m) {
-            return strip_br($m[0]);
+            return brbrbr_strip_br($m[0]);
         }, $content);
     }
 
@@ -54,7 +57,7 @@ function brBrbr($content)
 }
 
 
-function strip_br($str)
+function brbrbr_strip_br($str)
 {
     return str_replace(array("<br>", "<br/>", "<br />"), "", $str);
 }
