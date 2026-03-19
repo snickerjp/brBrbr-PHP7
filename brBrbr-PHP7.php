@@ -30,7 +30,7 @@ function brBrbr($content)
     $content = str_replace(array("\r\n", "\r"), "\n", $content);
     $content = str_replace("\n", "<br>\n", $content);
 
-    // Remove <br> immediately after block-level HTML tags
+    // Remove <br> immediately after specific HTML tags (block-level and related tags)
     $block_tags = 'table|img|thead|tfoot|caption|tbody|tr|td|th|div|dl|dd|dt'
                 . '|ul|ol|li|pre|select|form|textarea|input|blockquote'
                 . '|address|p|math|script|h[1-6]';
