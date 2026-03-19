@@ -22,7 +22,7 @@ WordPressはデフォルトで `wpautop` フィルターにより改行を `<p>`
 ## 動作要件
 
 - WordPress 4.0 以上
-- PHP 7.0 以上
+- PHP 5.3 以上（PHP 7.x / 8.x 対応）
 
 ## オリジナル
 
