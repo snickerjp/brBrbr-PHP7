@@ -3,7 +3,7 @@
 Plugin Name:brBrbr-PHP7
 Plugin URI:https://github.com/snickerjp/brBrbr-PHP7
 Description:Line feed is converted to &lt;br&gt;.
-Version:2.1.0
+Version:2.1.1
 Author:snickerjp
 Author URI:https://github.com/snickerjp/
 */
@@ -14,6 +14,8 @@ Original Version:2.0
 Original Author:CamCam
 Original Author URI:http://camcam.info/
 */
+
+defined('ABSPATH') || exit;
 
 remove_filter('the_content', 'wpautop');
 add_filter('the_content', 'brBrbr');
@@ -41,9 +43,11 @@ function brBrbr($content)
     $content = str_replace('</blockquote>', "</p></blockquote>\n<p>", $content);
 
     // Strip <br> inside pre, script, form blocks
-    $content = preg_replace_callback('/(<(?:pre|script|form).*?>)(.*?)<\/(?:pre|script|form)>/is', function($m) {
-        return strip_br($m[0]);
-    }, $content);
+    foreach (array('pre', 'script', 'form') as $tag) {
+        $content = preg_replace_callback("/(<{$tag}.*?>)(.*?)<\/{$tag}>/is", function($m) {
+            return strip_br($m[0]);
+        }, $content);
+    }
 
     $content = "<p>\n" . $content . "</p>\n";
     return $content;
@@ -52,9 +56,5 @@ function brBrbr($content)
 
 function strip_br($str)
 {
-    $str = str_replace(array("<br>", "<br/>", "<br />"), "", $str);
-    $str = str_replace('\"', '"', $str);
-    return $str;
+    return str_replace(array("<br>", "<br/>", "<br />"), "", $str);
 }
-
-?>
